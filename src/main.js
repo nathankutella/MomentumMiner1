@@ -1,7 +1,8 @@
+
 var config = {
     type: Phaser.AUTO,
-    width: 1900,
-    height: 925,
+    width: window.innerWidth*.96,
+    height: window.innerHeight*.96,
     physics: {
         default: 'arcade',
         arcade: {
@@ -34,12 +35,12 @@ var velocityLocked = [false, false]
 var platformSpeed = 101;
 var sliderSpeed = 450;
 
-var gravity = 350;
-var tempWidth = 1900;
-var tempLength = 925;
+var gravity = 350;    
+var tempWidth = window.innerWidth;
+var tempLength = window.innerHeight;
 
-var lengthOfHor = tempWidth - 110;
-var lengthOfVert = tempLength - 110;
+var lengthOfHor = tempWidth - window.innerWidth*.1;
+var lengthOfVert = tempLength - window.innerWidth*.1;
 
 var score = 0;
 
@@ -136,36 +137,34 @@ function create ()
 
 
     //Background of Vertical
-    this.add.rectangle(tempWidth - 30, tempLength / 2 - 15, 35, tempLength - 70, 0xbdbdbd).setStrokeStyle(20, 0xbdbdbd).setOrigin(0.5);
-    this.add.circle(tempWidth - 30, tempLength - 80, 5, 0xbdbdbd);
-    this.add.circle(tempWidth - 30, 30 , 5, 0xbdbdbd);
+    this.add.rectangle(window.innerWidth - window.innerWidth*.065, window.innerHeight / 2 - window.innerHeight*.045, window.innerWidth*.02, window.innerHeight - window.innerHeight*.15, 0xbdbdbd).setStrokeStyle(20, 0xbdbdbd).setOrigin(0.5);
 
-    //background of Horizontal
-    this.add.rectangle(tempWidth / 2 - 25, tempLength - 32, tempWidth-100, 35, 0xbdbdbd).setStrokeStyle(20, 0xbdbdbd).setOrigin(0.5);
-    this.add.circle(tempWidth - 80, tempLength - 32, 5, 0xbdbdbd);
-    this.add.circle(30, tempLength - 32, 5, 0xbdbdbd);
 
-    //Base Vertical Line
-    this.add.rectangle(tempWidth - 30, tempLength / 2 - 25, 12, tempLength - 110, 0xffffff).setStrokeStyle(2, 0x00000).setOrigin(0.5);
-    this.add.circle(tempWidth - 30, tempLength - 80, 5, 0xffffff);
-    this.add.circle(tempWidth - 30, 30 , 5, 0xffffff);
-    this.add.rectangle(tempWidth - 30, tempLength - 60, 50, 12, 0xffffff).setStrokeStyle(2, 0x00000).setOrigin(0.5);
+    // //background of Horizontal
+    this.add.rectangle(window.innerWidth / 2 - window.innerWidth*.045, window.innerHeight - window.innerHeight*.068, window.innerWidth - window.innerWidth*.125, window.innerHeight*.015, 0xbdbdbd).setStrokeStyle(20, 0xbdbdbd).setOrigin(0.5);
 
-    //Base Horixontal Line
-    this.add.rectangle(tempWidth / 2 - 25, tempLength - 32, tempWidth-110, 12, 0xffffff).setStrokeStyle(2, 0x00000).setOrigin(0.5);
-    this.add.circle(tempWidth - 80, tempLength - 32, 5, 0xffffff);
-    this.add.circle(30, tempLength - 32, 5, 0xffffff);
-    this.add.rectangle(tempWidth / 2, tempLength - 32, 12, 50, 0xffffff).setStrokeStyle(2, 0x00000).setOrigin(0.5);
+
+    // //Base Vertical Line
+    this.add.rectangle(window.innerWidth - window.innerWidth*.065, window.innerHeight / 2 - window.innerHeight*.045, window.innerWidth*.008, window.innerHeight - window.innerHeight*.2, 0xffffff).setStrokeStyle(2, 0xffffff).setOrigin(0.5);
+    this.add.circle   (window.innerWidth - window.innerWidth*.065, window.innerHeight*.055, window.innerWidth*.0045, 0xffffff);
+    this.add.circle   (window.innerWidth - window.innerWidth*.065, window.innerHeight*.855, window.innerWidth*.0045, 0xffffff);
+    this.add.rectangle(window.innerWidth - window.innerWidth*.065, window.innerHeight*.875, window.innerWidth*.02 + 2, window.innerHeight*.0085 + 2, 0xffffff).setStrokeStyle(2, 0x00000).setOrigin(0.5);
+
+    // //Base Horixontal Line
+    this.add.rectangle(window.innerWidth / 2 - window.innerWidth*.045, window.innerHeight - window.innerHeight*.068, window.innerWidth - window.innerWidth*.135, window.innerHeight*.007, 0xffffff).setStrokeStyle(2, 0xffffff).setOrigin(0.5);
+    this.add.circle   (window.innerWidth*.022, window.innerHeight - window.innerHeight*.068, window.innerHeight*.0045, 0xffffff);
+    this.add.circle   (window.innerWidth*.888, window.innerHeight - window.innerHeight*.068, window.innerHeight*.0045, 0xffffff);
+    this.add.rectangle(window.innerWidth / 2 - window.innerWidth*.045,window.innerHeight - window.innerHeight*.068, window.innerWidth*.0035 + 2, window.innerHeight*.025 + 2, 0xffffff).setStrokeStyle(2, 0x00000).setOrigin(0.5);
 
     //Vertical Ball
-    verticalSlider = this.physics.add.sprite(tempWidth - 30, tempLength / 2, 'bomb').setScale(2, 2);
+    verticalSlider = this.physics.add.sprite(window.innerWidth - window.innerWidth*.065,window.innerHeight / 2 - window.innerHeight*.045, 'bomb').setScale(2, 2);
     verticalSlider.body.gravity.y = -gravity;
-    verticalSlider.setVelocityY(-sliderSpeed);
+    verticalSlider.setVelocityY(-(window.innerHeight*0.35));
 
     //Horizontal Ball
-    horizontalSlider = this.physics.add.sprite(tempWidth / 2, tempLength - 32, 'bomb').setScale(2, 2);
+    horizontalSlider = this.physics.add.sprite(window.innerWidth / 2 - window.innerWidth*.045,  window.innerHeight - window.innerHeight*.068, 'bomb').setScale(2, 2);
     horizontalSlider.body.gravity.y = -gravity;
-    horizontalSlider.setVelocityX(-sliderSpeed*1.5);
+    horizontalSlider.setVelocityX(-(window.innerWidth*0.35));
 
     player.setFrictionX(.1);
     player.setFrictionY(.1);
@@ -238,8 +237,8 @@ function update ()
                 player.setVelocityX((-((lengthOfHor/200)*((tempWidth/2)-horizontalSlider.x)*.02))); 
                 velocityLocked[0] = false;
                 velocityLocked[1] = false;
-                verticalSlider.setVelocityY(sliderSpeed);
-                horizontalSlider.setVelocityX(sliderSpeed*1.5);
+                verticalSlider.setVelocityY(window.innerHeight*0.35);
+                horizontalSlider.setVelocityX(window.innerWidth*0.35);
             } else {
                 horizontalSlider.setVelocityX(0);
                 velocityLocked[1] = true;
@@ -258,16 +257,16 @@ function update ()
     } 
 
 
-    if (verticalSlider.y >= (tempLength - 95)) {
-        verticalSlider.setVelocityY(-sliderSpeed); // Move left
-    } else if (verticalSlider.y <= (tempLength/2 - ((tempLength - 100)/2))) {
-        verticalSlider.setVelocityY(sliderSpeed); // Move right
+    if (verticalSlider.y >= (window.innerHeight*.845)) {
+        verticalSlider.setVelocityY(-(window.innerHeight*0.35)); // Move left
+    } else if (verticalSlider.y <= (window.innerHeight*.065)) {
+        verticalSlider.setVelocityY(window.innerHeight*0.35); // Move right
     }
 
-    if (horizontalSlider.x >= (tempWidth - 95)) {
-        horizontalSlider.setVelocityX(-sliderSpeed*1.5); // Move left
-    } else if (horizontalSlider.x <= (tempWidth/2 - ((tempWidth - 100)/2))) {
-        horizontalSlider.setVelocityX(sliderSpeed*1.5); // Move right
+    if (horizontalSlider.x >= (window.innerWidth*.878)) {
+        horizontalSlider.setVelocityX(-(window.innerWidth*0.35)); // Move left
+    } else if (horizontalSlider.x <= (window.innerWidth*.032)) {
+        horizontalSlider.setVelocityX(window.innerWidth*0.35); // Move right
     }
 
 }
