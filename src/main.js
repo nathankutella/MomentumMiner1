@@ -32,16 +32,10 @@ var verticalSlider;
 var velocityLocked = [false, false]
 
 
-var platformSpeed = 101;
+var platformSpeed = 100;
 var sliderSpeed = 450;
-
+var universalScale = (window.innerWidth*.96) / 2000
 var gravity = 350;    
-var tempWidth = window.innerWidth;
-var tempLength = window.innerHeight;
-
-var lengthOfHor = tempWidth - window.innerWidth*.1;
-var lengthOfVert = tempLength - window.innerWidth*.1;
-
 var score = 0;
 
 function preload ()
@@ -74,7 +68,7 @@ function create ()
 
     scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
 
-    this.add.image(tempWidth/2, tempLength/2, 'sky').setScale(2.5);
+    this.add.image(window.innerWidth/2, window.innerHeight/2, 'sky').setScale(universalScale*2.5);
 
 
     platforms = this.physics.add.staticGroup();
@@ -88,7 +82,7 @@ function create ()
     movingPlatform.body.allowGravity = false;
     movingPlatform.setVelocityX(platformSpeed);
 
-    player = this.physics.add.sprite(100, 450, 'dude');
+    player = this.physics.add.sprite(100, 450, 'dude').setScale(universalScale, universalScale);
     
     player.setBounce(0.2);
     player.setCollideWorldBounds(true);
@@ -157,12 +151,12 @@ function create ()
     this.add.rectangle(window.innerWidth / 2 - window.innerWidth*.045,window.innerHeight - window.innerHeight*.068, window.innerWidth*.0035 + 2, window.innerHeight*.025 + 2, 0xffffff).setStrokeStyle(2, 0x00000).setOrigin(0.5);
 
     //Vertical Ball
-    verticalSlider = this.physics.add.sprite(window.innerWidth - window.innerWidth*.065,window.innerHeight / 2 - window.innerHeight*.045, 'bomb').setScale(2, 2);
+    verticalSlider = this.physics.add.sprite(window.innerWidth - window.innerWidth*.065,window.innerHeight / 2 - window.innerHeight*.045, 'bomb').setScale(universalScale*2, universalScale*2);
     verticalSlider.body.gravity.y = -gravity;
     verticalSlider.setVelocityY(-(window.innerHeight*0.35));
 
     //Horizontal Ball
-    horizontalSlider = this.physics.add.sprite(window.innerWidth / 2 - window.innerWidth*.045,  window.innerHeight - window.innerHeight*.068, 'bomb').setScale(2, 2);
+    horizontalSlider = this.physics.add.sprite(window.innerWidth / 2 - window.innerWidth*.045,  window.innerHeight - window.innerHeight*.068, 'bomb').setScale((window.innerHeight*.96) / 1000*2, (window.innerHeight*.96) / 1000*2);
     horizontalSlider.body.gravity.y = -gravity;
     horizontalSlider.setVelocityX(-(window.innerWidth*0.35));
 
@@ -233,8 +227,8 @@ function update ()
     if (Phaser.Input.Keyboard.JustDown(spaceBar)) {
         if (velocityLocked[0]) {
             if (velocityLocked[1]) { 
-                player.setVelocityY((-(lengthOfVert/100)*((tempLength-80)-verticalSlider.y)*.05) - 50); 
-                player.setVelocityX((-((lengthOfHor/200)*((tempWidth/2)-horizontalSlider.x)*.02))); 
+                player.setVelocityY(((400/window.innerHeight)*((verticalSlider.y - window.innerHeight*.845)))-50); 
+                player.setVelocityX((250/window.innerWidth)*(horizontalSlider.x - window.innerWidth*.455)); 
                 velocityLocked[0] = false;
                 velocityLocked[1] = false;
                 verticalSlider.setVelocityY(window.innerHeight*0.35);
