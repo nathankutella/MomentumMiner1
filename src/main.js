@@ -214,6 +214,19 @@ function create ()
         player.y = allMoves[allMoves.length-2][1];
         layer.x = allMoves[allMoves.length-2][2];
         layer.y = allMoves[allMoves.length-2][3];
+            // layer.x = map.x
+        bg.x = layer.x
+        cosmetics.x = layer.x
+        spikes.x = layer.x
+        shading.x = layer.x
+        chest.x = layer.x
+        
+        // layer.y = map.y
+        bg.y = layer.y
+        cosmetics.y = layer.y
+        spikes.y = layer.y
+        shading.y = layer.y
+        chest.y = layer.y
         console.log('Button clicked!');
         // Add the functionality you want here
     });
