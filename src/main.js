@@ -20,6 +20,9 @@ var config = {
 
 var game = new Phaser.Game(config);
 
+var slidersMovement = [-1, -1]
+var levelPRs = [null]
+
 var map;
 var tileset;
 var bg;
@@ -30,6 +33,8 @@ var layer;
 var cosmetics;
 
 var menu;
+
+
 
 var platforms;
 var movingPlatform;
@@ -56,6 +61,8 @@ var score = 0;
 
 function preload ()
 {
+    this.load.image('button', 'assets/button.png');
+    this.load.image('close', 'assets/x.png');
     this.load.image('rewind', 'assets/rewind.png');
     this.load.image('menu', 'assets/menu.png');
     this.load.image('pause', 'assets/pause.png');
@@ -80,20 +87,20 @@ function create ()
     map = this.make.tilemap({ key: "map1" });
     tileset = map.addTilesetImage("update1", "tiles");
 
-    bg = map.createLayer("background", tileset, 0, -450 * universalScale).setScale(universalScale, universalScale);
-    shading = map.createLayer("shading", tileset, 0, -450 * universalScale).setScale(universalScale, universalScale);
-    spikes = map.createLayer("spikes", tileset, 0, -450 * universalScale).setScale(universalScale, universalScale);
-    layer = map.createLayer("Tile Layer 1", tileset, 0, -450 * universalScale).setScale(universalScale, universalScale);
-    chest = map.createLayer("chest", tileset, 0, -450 * universalScale).setScale(universalScale, universalScale);
-    cosmetics = map.createLayer("cosmetics", tileset, 0, -450 * universalScale).setScale(universalScale, universalScale);
+    bg = map.createLayer("background", tileset, 0, -640 * universalScale + window.innerHeight).setScale(universalScale, universalScale);
+    shading = map.createLayer("shading", tileset, 0, -640 * universalScale + window.innerHeight).setScale(universalScale, universalScale);
+    spikes = map.createLayer("spikes", tileset, 0, -640 * universalScale + window.innerHeight).setScale(universalScale, universalScale);
+    layer = map.createLayer("Tile Layer 1", tileset, 0, -640 * universalScale + window.innerHeight).setScale(universalScale, universalScale);
+    chest = map.createLayer("chest", tileset, 0, -640 * universalScale + window.innerHeight).setScale(universalScale, universalScale);
+    cosmetics = map.createLayer("cosmetics", tileset, 0, -640 * universalScale + window.innerHeight).setScale(universalScale, universalScale);
 
     spikes.setCollisionByProperty({ collides: true });
-    layer.setCollisionByExclusion([-1]);
+    spikes.setCollisionByExclusion([-1]);
 
     layer.setCollisionByProperty({ collides: true });
     layer.setCollisionByExclusion([-1]);
 
-    player = this.physics.add.sprite(100, 450, 'dude').setScale( universalScale/2, universalScale/2);
+    player = this.physics.add.sprite(window.innerHeight*0.05, window.innerHeight - universalScale*64, 'dude').setScale( universalScale/2, universalScale/2);
     
 
     player.setBounce(0.2);
@@ -153,12 +160,12 @@ function create ()
     //Vertical Ball
     verticalSlider = this.physics.add.sprite(window.innerWidth - window.innerWidth*.065,window.innerHeight / 2 - window.innerHeight*.045, 'bomb').setScale((window.innerWidth*.96) / 2000*2, (window.innerWidth*.96) / 2000*2);
     verticalSlider.body.gravity.y = -gravity;
-    verticalSlider.setVelocityY(-(window.innerHeight*0.35));
+    verticalSlider.setVelocityY(slidersMovement[1]*(window.innerHeight*0.35));
 
     //Horizontal Ball
     horizontalSlider = this.physics.add.sprite(window.innerWidth / 2 - window.innerWidth*.045,  window.innerHeight - window.innerHeight*.068, 'bomb').setScale((window.innerHeight*.96) / 1000*2, (window.innerHeight*.96) / 1000*2);
     horizontalSlider.body.gravity.y = -gravity;
-    horizontalSlider.setVelocityX(-(window.innerWidth*0.35));
+    horizontalSlider.setVelocityX(slidersMovement[1]*(window.innerWidth*0.35));
 
     player.setFrictionX(.1);
     player.setFrictionY(.1);
@@ -166,51 +173,69 @@ function create ()
     var textSize = window.innerWidth*0.025;
 
     startTime = this.time.now;
-    timerText = this.add.text(window.innerWidth*0.075, window.innerHeight*0.012, 'Time: 0s', { fontSize: textSize + 'px', fill: '#000' });
+    timerText = this.add.text(window.innerWidth*0.075, window.innerHeight*0.012, 'Time: 0s', { fontSize: textSize + 'px', fill: '#000000' });
 
 
     let pause = this.add.image(window.innerWidth*0.02, window.innerHeight*0.03, 'pause').setInteractive().setScale(universalScale/2);
     let rewind = this.add.image(window.innerWidth*0.05, window.innerHeight*0.03, 'rewind').setInteractive().setScale(universalScale/2);
 
-    menu = this.add.image(window.innerWidth*0.48,  window.innerHeight*0.48, 'menu').setInteractive().setScale(universalScale, universalScale * 0.65).setVisible(false);;
-
-
-    let button = this.add.image(100, 100, 'buttonImage').setInteractive();
-        button.on('pointerdown', () => {
+    menu = this.add.image(window.innerWidth*0.48,  window.innerHeight*0.48, 'menu').setInteractive().setScale(window.innerWidth / 400, window.innerHeight / 300).setVisible(false);
+    let button1 = this.add.image(window.innerWidth*0.48, window.innerHeight* 0.43, 'button').setInteractive().setScale(window.innerWidth / 480, window.innerHeight / 420).setVisible(false);
+    let button2 = this.add.image(window.innerWidth*0.48, window.innerHeight* 0.58, 'button').setInteractive().setScale(window.innerWidth / 480, window.innerHeight / 420).setVisible(false);
+    let button3 = this.add.image(window.innerWidth*0.48, window.innerHeight* 0.73, 'button').setInteractive().setScale(window.innerWidth / 480, window.innerHeight / 420).setVisible(false);
+    let menuText = this.add.text(window.innerWidth * 0.31, window.innerHeight * 0.13, 'MENU', { fontSize: window.innerWidth * 0.15 + 'px', fill: '#FFFFFF' }).setShadow(5, 5, '#000000', 5).setVisible(false);
+    
+    let close = this.add.image(window.innerWidth*0.13,  window.innerHeight*0.15, 'close').setInteractive().setScale(window.innerWidth / 400, window.innerHeight / 300).setVisible(false);
+        close.on('pointerdown', () => {
         menu.setVisible(!menu.visible);
-        verticalSlider.setVelocityY(window.innerHeight*0.35);
-        horizontalSlider.setVelocityX(window.innerWidth*0.35);
+        close.setVisible(!close.visible);
+        menuText.setVisible(!menuText.visible);
+        button1.setVisible(!button1.visible);
+        button2.setVisible(!button2.visible);
+        button3.setVisible(!button3.visible);
+        verticalSlider.setVelocityY(slidersMovement[0]*window.innerHeight*0.35);
+        horizontalSlider.setVelocityX(slidersMovement[1]*window.innerWidth*0.35);
     });
 
+
+
     pause.on('pointerover', () => {
-        pause.setTint(0xaaaaaa); // Darken on hover
+        pause.setTint(0xaaaaaa); 
     });
 
 
     pause.on('pointerout', () => {
-        pause.clearTint(); // Remove tint when not hovering
+        pause.clearTint(); 
     });
 
 
     pause.on('pointerdown', () => {
-        menu.setVisible(!menu.visible);
+        if (!menu.visible){
+                    menu.setVisible(!menu.visible);
+        close.setVisible(!close.visible);
+        menuText.setVisible(!menuText.visible);
+        button1.setVisible(!button1.visible);
+        button2.setVisible(!button2.visible);
+        button3.setVisible(!button3.visible);
+        }
         console.log('Button clicked!');
-        // Add the functionality you want here
     });
 
 
     rewind.on('pointerover', () => {
-        rewind.setTint(0xaaaaaa); // Darken on hover
+        console.log(allMoves[allMoves.length-2] + 'Button clicked!');
+        rewind.setTint(0xaaaaaa);
     });
 
 
     rewind.on('pointerout', () => {
-        rewind.clearTint(); // Remove tint when not hovering
+        rewind.clearTint(); 
     });
 
 
     rewind.on('pointerdown', () => {
-        player.x = allMoves[allMoves.length-2][0];
+        if (!menu.visible){
+                    player.x = allMoves[allMoves.length-2][0];
         player.y = allMoves[allMoves.length-2][1];
         layer.x = allMoves[allMoves.length-2][2];
         layer.y = allMoves[allMoves.length-2][3];
@@ -229,10 +254,22 @@ function create ()
         chest.y = layer.y
         console.log('Button clicked!');
         // Add the functionality you want here
+        }
     });
 
     this.physics.add.collider(player, layer);
     this.physics.add.collider(player, spikes);
+
+    this.physics.add.collider(player, spikes, onLayerCollision, null, this);
+
+    function onLayerCollision(player, tile) {
+    console.log("Player collided with a tile in this layer!");
+
+    // Example: Check for specific tile index (if you need a particular tile)
+    if (tile.index === 5) { 
+        console.log("Player hit a special tile!");
+    }
+}
     // this.physics.add.collider(player, platforms);
     // this.physics.add.collider(player, movingPlatform);
     // this.physics.add.collider(stars, platforms);
@@ -244,28 +281,9 @@ function update ()
 {
 
     let elapsedTime = Math.floor((this.time.now - startTime) / 1000); // Convert to seconds
-    timerText.setText('Time: ' + elapsedTime + 's'); // Update text
+    timerText.setText('Time: ' + elapsedTime + 's' + '  PR: ' + levelPRs[0]); // Update text
 
     cursors = this.input.keyboard.createCursorKeys();
-
-    // if (cursors.left.isDown)
-    // {
-    //     player.setVelocityX(-160);
-
-    //     player.anims.play('left', true);
-    // }
-    // else if (cursors.right.isDown)
-    // {
-    //     player.setVelocityX(160);
-
-    //     player.anims.play('right', true);
-    // }
-    // else
-    // {
-    //     // player.setVelocityX(0);
-
-    //     player.anims.play('turn');
-    // }
 
     if (cursors.up.isDown && player.body.touching.down)
     {
@@ -274,7 +292,7 @@ function update ()
 
     if (player.body.blocked.down){
         if (hasMoved){
-            allMoves.push([player.x, player.y, map.x, map.y]);
+            allMoves.push([player.x, player.y, layer.x, layer.y]);
             hasMoved = false;
         }
         player.setVelocityX(0);
@@ -304,15 +322,18 @@ function update ()
     if (Phaser.Input.Keyboard.JustDown(spaceBar)) {
         if (velocityLocked[0]) {
             if (velocityLocked[1]) { 
-                player.setVelocityY((universalScale*1.5)*(((window.innerHeight*.845 - verticalSlider.y)/window.innerWidth*.795)*(-100/0.41))); 
-                player.setVelocityX((universalScale*1.5)*(((horizontalSlider.x - window.innerWidth*.455)/window.innerWidth*.4325)*(100/0.18))); 
-                console.log((((window.innerHeight*.845 - verticalSlider.y)/window.innerWidth*.795)) + 'Button clicked!');
+                if (player.body.blocked.down){
+                    player.setVelocityY((universalScale*.52)*(((window.innerHeight*.845 - verticalSlider.y)/window.innerHeight*.795)*(-100/0.41))-(universalScale*64)); 
+                player.setVelocityX((universalScale*.3)*(((horizontalSlider.x - window.innerWidth*.455)/window.innerWidth*.4325)*(100/0.18))); 
+                console.log((((window.innerHeight*.845 - verticalSlider.y)/window.innerHeight*.795)) + 'Button clicked!');
                 console.log((((horizontalSlider.x - window.innerWidth*.455)/window.innerWidth*.4325)) + 'Button clicked!');
                 velocityLocked[0] = false;
                 velocityLocked[1] = false;
-                verticalSlider.setVelocityY(window.innerHeight*0.35);
-                horizontalSlider.setVelocityX(window.innerWidth*0.35);
+                
+                verticalSlider.setVelocityY(slidersMovement[0]*window.innerHeight*0.35);
+                horizontalSlider.setVelocityX(slidersMovement[1]*window.innerWidth*0.35);
                 hasMoved = true;
+                }
             } else {
                 horizontalSlider.setVelocityX(0);
                 velocityLocked[1] = true;
@@ -336,13 +357,17 @@ function update ()
     }
 
     if (verticalSlider.y >= (window.innerHeight*.845)) {
+        slidersMovement[0] = -1;
         verticalSlider.setVelocityY(-(window.innerHeight*0.35)); // Move left
     } else if (verticalSlider.y <= (window.innerHeight*.065)) {
+        slidersMovement[0] = 1;
         verticalSlider.setVelocityY(window.innerHeight*0.35); // Move right
     }
     if (horizontalSlider.x >= (window.innerWidth*.878)) {
+        slidersMovement[1] = -1;
         horizontalSlider.setVelocityX(-(window.innerWidth*0.35)); // Move left
     } else if (horizontalSlider.x <= (window.innerWidth*.032)) {
+        slidersMovement[1] = 1;
         horizontalSlider.setVelocityX(window.innerWidth*0.35); // Move right
     }
 
