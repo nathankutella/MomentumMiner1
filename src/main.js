@@ -323,16 +323,25 @@ function update ()
         if (velocityLocked[0]) {
             if (velocityLocked[1]) { 
                 if (player.body.blocked.down){
-                    player.setVelocityY((universalScale*.52)*(((window.innerHeight*.845 - verticalSlider.y)/window.innerHeight*.795)*(-100/0.41))-(universalScale*64)); 
-                player.setVelocityX((universalScale*.3)*(((horizontalSlider.x - window.innerWidth*.455)/window.innerWidth*.4325)*(100/0.18))); 
-                console.log((((window.innerHeight*.845 - verticalSlider.y)/window.innerHeight*.795)) + 'Button clicked!');
-                console.log((((horizontalSlider.x - window.innerWidth*.455)/window.innerWidth*.4325)) + 'Button clicked!');
-                velocityLocked[0] = false;
-                velocityLocked[1] = false;
-                
-                verticalSlider.setVelocityY(slidersMovement[0]*window.innerHeight*0.35);
-                horizontalSlider.setVelocityX(slidersMovement[1]*window.innerWidth*0.35);
-                hasMoved = true;
+                    player.setVelocityY(-Math.sqrt((universalScale*150000)*(((window.innerHeight*.845 - verticalSlider.y)/window.innerHeight*.795)))); 
+                    // -(universalScale*64)
+                    if ((((horizontalSlider.x - window.innerWidth*.455)/window.innerWidth*.4325)) < 0){
+                        player.setVelocityX(-Math.sqrt((universalScale*100000)*(-((horizontalSlider.x - window.innerWidth*.455)/window.innerWidth*.4325)))); 
+                        console.log(-Math.sqrt((universalScale*100000)*(-((horizontalSlider.x - window.innerWidth*.455)/window.innerWidth*.4325))) + 'horiz');
+
+                    } else {
+                        player.setVelocityX(Math.sqrt((universalScale*100000)*(((horizontalSlider.x - window.innerWidth*.455)/window.innerWidth*.4325)))); 
+                        console.log(Math.sqrt((universalScale*100000)*(((horizontalSlider.x - window.innerWidth*.455)/window.innerWidth*.4325))) + 'horiz');
+                    }
+                    console.log(-Math.sqrt((universalScale*280)*(((window.innerHeight*.845 - verticalSlider.y)/window.innerHeight*.795))) + 'vert');
+                    console.log(universalScale + 'scale');
+
+                    velocityLocked[0] = false;
+                    velocityLocked[1] = false;
+                    
+                    verticalSlider.setVelocityY(slidersMovement[0]*window.innerHeight*0.35);
+                    horizontalSlider.setVelocityX(slidersMovement[1]*window.innerWidth*0.35);
+                    hasMoved = true;
                 }
             } else {
                 horizontalSlider.setVelocityX(0);
