@@ -10,6 +10,7 @@ var config = {
             debug: false
         }
     },
+    pixelArt: true,
     scene: {
         preload: preload,
         create: create,
@@ -46,6 +47,9 @@ var timerText;
 var horizontalSlider;
 var verticalSlider;
 var velocityLocked = [false, false]
+
+let spikeTimer = null;
+let inSpike = false;
 
 var startTime;
 
@@ -239,6 +243,7 @@ function create ()
         player.y = allMoves[allMoves.length-2][1];
         layer.x = allMoves[allMoves.length-2][2];
         layer.y = allMoves[allMoves.length-2][3];
+        allMoves.pop();
             // layer.x = map.x
         bg.x = layer.x
         cosmetics.x = layer.x
@@ -258,24 +263,53 @@ function create ()
     });
 
     this.physics.add.collider(player, layer);
-    this.physics.add.collider(player, spikes);
+    // this.physics.add.collider(player, spikes);
 
-    this.physics.add.collider(player, spikes, onLayerCollision, null, this);
+    this.physics.add.overlap(player, spikes, onLayerCollision, checkSpikeOverlap, this);
+
+
+    function checkSpikeOverlap(player, tile) {
+        // Ensure we're only detecting spikes
+        return tile.index !== 0; // Make sure we're not detecting empty tiles
+    }
+
 
     function onLayerCollision(player, tile) {
-    console.log("Player collided with a tile in this layer!");
 
-    // Example: Check for specific tile index (if you need a particular tile)
-    if (tile.index === 5) { 
-        console.log("Player hit a special tile!");
+        if (!tile || tile.index === 0 || tile.index === -1) return; 
+
+        if (inSpike) {
+            console.log("Tile: , ");
+        }
+
+        spikeTimer = player.scene.time.delayedCall(10, () => {
+            inSpike = true;
+        });
+
+        // let tileCenterX = tile.pixelX;
+        // let tileCenterY = tile.pixelY;
+
+        // let playerLeft = player.x - player.width / 2;
+        // let playerRight = player.x + player.width / 2;
+        // let playerTop = player.y - player.height / 2;
+        // let playerBottom = player.y + player.height / 2;
+
+        // console.log("Tile: ", tileCenterX, ", ", tileCenterY, "  Player: ", playerLeft, ", ", playerRight, ", ", playerTop, ", ", playerBottom);
+
+        // if (playerLeft <= tileCenterX && playerRight >= tileCenterX && 
+        //     playerTop <= tileCenterY && playerBottom >= tileCenterY) {
+            
+        //     console.log("Player touched the exact center of the spike!");
+        //     // Handle what happens when the player touches the spike
+        // }
+
     }
-}
     // this.physics.add.collider(player, platforms);
     // this.physics.add.collider(player, movingPlatform);
     // this.physics.add.collider(stars, platforms);
     // this.physics.add.collider(stars, movingPlatform);
     // this.physics.add.overlap(player, stars, collectStar, null, this);
-    }
+}
 
 function update ()
 {
@@ -296,6 +330,7 @@ function update ()
             hasMoved = false;
         }
         player.setVelocityX(0);
+        inSpike = false;
         player.anims.play('turn');
     } else {
         if (player.body.velocity.x > 0){
