@@ -23,6 +23,8 @@ var game = new Phaser.Game(config);
 
 var slidersMovement = [-1, -1]
 var levelPRs = [null]
+var level = 1;
+let elapsedTime;
 
 var map;
 var tileset;
@@ -98,17 +100,28 @@ function create ()
     chest = map.createLayer("chest", tileset, 0, -640 * universalScale + window.innerHeight).setScale(universalScale, universalScale);
     cosmetics = map.createLayer("cosmetics", tileset, 0, -640 * universalScale + window.innerHeight).setScale(universalScale, universalScale);
 
+    chest.setCollisionByProperty({ collides: true });
+    chest.setCollisionByExclusion([-1]);
+
     spikes.setCollisionByProperty({ collides: true });
     spikes.setCollisionByExclusion([-1]);
 
     layer.setCollisionByProperty({ collides: true });
     layer.setCollisionByExclusion([-1]);
 
+
+
+
     player = this.physics.add.sprite(window.innerHeight*0.05, window.innerHeight - universalScale*64, 'dude').setScale( universalScale/2, universalScale/2);
     
 
     player.setBounce(0.2);
     player.setCollideWorldBounds(true);
+
+        stars = this.physics.add.sprite(window.innerHeight*0.05, window.innerHeight - universalScale*64, 'star').setScale( universalScale/5, universalScale/5);
+
+    stars.setBounce(0);
+    stars.setCollideWorldBounds(true);
 
 
     this.anims.create({
@@ -239,7 +252,7 @@ function create ()
 
     rewind.on('pointerdown', () => {
         if (!menu.visible){
-                    player.x = allMoves[allMoves.length-2][0];
+        player.x = allMoves[allMoves.length-2][0];
         player.y = allMoves[allMoves.length-2][1];
         layer.x = allMoves[allMoves.length-2][2];
         layer.y = allMoves[allMoves.length-2][3];
@@ -263,59 +276,83 @@ function create ()
     });
 
     this.physics.add.collider(player, layer);
+    this.physics.add.collider(stars, layer);
     // this.physics.add.collider(player, spikes);
 
-    this.physics.add.overlap(player, spikes, onLayerCollision, checkSpikeOverlap, this);
+    this.physics.add.overlap(player, chest, onChestCollision, checkOverlap, this);
+    this.physics.add.overlap(stars, spikes, onSpikeCollision, checkOverlap, this);
 
 
-    function checkSpikeOverlap(player, tile) {
+    function checkOverlap(colliders, tile) {
         // Ensure we're only detecting spikes
         return tile.index !== 0; // Make sure we're not detecting empty tiles
     }
 
 
-    function onLayerCollision(player, tile) {
+    function onChestCollision(colliders, tile) {
 
         if (!tile || tile.index === 0 || tile.index === -1) return; 
 
-        if (inSpike) {
-            console.log("Tile: , ");
+        if (levelPRs[level-1] > elapsedTime || levelPRs[level-1] == null) {
+            levelPRs[level-1] = elapsedTime;
         }
+        
+        player.x = allMoves[0][0];
+        player.y = allMoves[0][1];
+        layer.x = allMoves[0][2];
+        layer.y = allMoves[0][3];
+            // layer.x = map.x
+        bg.x = layer.x
+        cosmetics.x = layer.x
+        spikes.x = layer.x
+        shading.x = layer.x
+        chest.x = layer.x
+        
+        // layer.y = map.y
+        bg.y = layer.y
+        cosmetics.y = layer.y
+        spikes.y = layer.y
+        shading.y = layer.y
+        chest.y = layer.y
 
-        spikeTimer = player.scene.time.delayedCall(10, () => {
-            inSpike = true;
-        });
+        allMoves.splice(0, allMoves.length);
 
-        // let tileCenterX = tile.pixelX;
-        // let tileCenterY = tile.pixelY;
-
-        // let playerLeft = player.x - player.width / 2;
-        // let playerRight = player.x + player.width / 2;
-        // let playerTop = player.y - player.height / 2;
-        // let playerBottom = player.y + player.height / 2;
-
-        // console.log("Tile: ", tileCenterX, ", ", tileCenterY, "  Player: ", playerLeft, ", ", playerRight, ", ", playerTop, ", ", playerBottom);
-
-        // if (playerLeft <= tileCenterX && playerRight >= tileCenterX && 
-        //     playerTop <= tileCenterY && playerBottom >= tileCenterY) {
-            
-        //     console.log("Player touched the exact center of the spike!");
-        //     // Handle what happens when the player touches the spike
-        // }
-
+        console.log("Player touched the exact center of the spike!");
     }
-    // this.physics.add.collider(player, platforms);
-    // this.physics.add.collider(player, movingPlatform);
-    // this.physics.add.collider(stars, platforms);
-    // this.physics.add.collider(stars, movingPlatform);
-    // this.physics.add.overlap(player, stars, collectStar, null, this);
+
+    function onSpikeCollision(colliders, tile) {
+
+        if (!tile || tile.index === 0 || tile.index === -1) return; 
+        
+        player.x = allMoves[0][0];
+        player.y = allMoves[0][1];
+        layer.x = allMoves[0][2];
+        layer.y = allMoves[0][3];
+            // layer.x = map.x
+        bg.x = layer.x
+        cosmetics.x = layer.x
+        spikes.x = layer.x
+        shading.x = layer.x
+        chest.x = layer.x
+        
+        // layer.y = map.y
+        bg.y = layer.y
+        cosmetics.y = layer.y
+        spikes.y = layer.y
+        shading.y = layer.y
+        chest.y = layer.y
+
+
+        console.log("Player touched the exact center of the spike!");
+    }
+
 }
 
 function update ()
 {
 
-    let elapsedTime = Math.floor((this.time.now - startTime) / 1000); // Convert to seconds
-    timerText.setText('Time: ' + elapsedTime + 's' + '  PR: ' + levelPRs[0]); // Update text
+    elapsedTime = Math.floor((this.time.now - startTime) / 1000); // Convert to seconds
+    timerText.setText('Time: ' + elapsedTime + 's' + '  PR: ' + levelPRs[level - 1]); // Update text
 
     cursors = this.input.keyboard.createCursorKeys();
 
@@ -330,9 +367,13 @@ function update ()
             hasMoved = false;
         }
         player.setVelocityX(0);
+        stars.setVelocityY(-6);
         inSpike = false;
-        player.anims.play('turn');
+        player.anims.play('turn');  
     } else {
+        stars.setVelocityY(0);
+        stars.x = player.x 
+        stars.y = player.y + universalScale*5
         if (player.body.velocity.x > 0){
             player.anims.play('right', true);
         } else if (player.body.velocity.x < 0){
@@ -342,6 +383,10 @@ function update ()
         }
     }
 
+    var wKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+    var aKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+    var sKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+    var dKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
     var spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
     // if (spaceBar.isDown && player.body.touching.down){
@@ -353,6 +398,19 @@ function update ()
     // } else if (movingPlatform.x <= 200) {
     //     movingPlatform.setVelocityX(platformSpeed); // Move right
     // }
+
+    if (Phaser.Input.Keyboard.JustDown(this.wKey)) {
+        player.setVelocityX(-Math.sqrt((universalScale*100000)*(-((horizontalSlider.x - window.innerWidth*.455)/window.innerWidth*.4325)))); 
+    }
+    if (Phaser.Input.Keyboard.JustDown(this.aKey)) {
+        player.setVelocityY(-Math.sqrt((universalScale*100000)*(-((horizontalSlider.x - window.innerWidth*.455)/window.innerWidth*.4325)))); 
+    }
+    if (Phaser.Input.Keyboard.JustDown(this.sKey)) {
+        player.setVelocityX(-Math.sqrt((universalScale*100000)*(-((horizontalSlider.x - window.innerWidth*.455)/window.innerWidth*.4325)))); 
+    }
+    if (Phaser.Input.Keyboard.JustDown(this.dKey)) {
+        player.setVelocityY(-Math.sqrt((universalScale*100000)*(-((horizontalSlider.x - window.innerWidth*.455)/window.innerWidth*.4325)))); 
+    }
 
     if (Phaser.Input.Keyboard.JustDown(spaceBar)) {
         if (velocityLocked[0]) {
