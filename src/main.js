@@ -1,4 +1,6 @@
 
+import { MapScene } from './scenes/MapScene.js';
+
 var config = {
     type: Phaser.AUTO,
     width: window.innerWidth*.96,
@@ -11,11 +13,11 @@ var config = {
         }
     },
     pixelArt: true,
-    scene: {
-        preload: preload,
-        create: create,
-        update: update
-    }
+    scene: 
+        [MapScene]
+    //     preload: preload,
+    //     create: create,
+    //     update: update
 };
 
 
@@ -118,7 +120,7 @@ function create ()
     player.setBounce(0.2);
     player.setCollideWorldBounds(true);
 
-        stars = this.physics.add.sprite(window.innerHeight*0.05, window.innerHeight - universalScale*64, 'star').setScale( universalScale/5, universalScale/5);
+        stars = this.physics.add.sprite(window.innerHeight*0.05, window.innerHeight - universalScale*64, 'star').setScale( universalScale/10, universalScale/5).setVisible(false);
 
     stars.setBounce(0);
     stars.setCollideWorldBounds(true);
@@ -143,14 +145,6 @@ function create ()
         frameRate: 10,
         repeat: -1
            });
-
-
-    function hitSpikes ()
-    {
-        startTime = this.time.now;
-        player.x = 100;
-        player.y = 450;
-    }
 
 
 
@@ -296,9 +290,10 @@ function create ()
         if (levelPRs[level-1] > elapsedTime || levelPRs[level-1] == null) {
             levelPRs[level-1] = elapsedTime;
         }
+        startTime = this.time.now;
         
-        player.x = allMoves[0][0];
-        player.y = allMoves[0][1];
+
+
         layer.x = allMoves[0][2];
         layer.y = allMoves[0][3];
             // layer.x = map.x
@@ -315,9 +310,13 @@ function create ()
         shading.y = layer.y
         chest.y = layer.y
 
-        allMoves.splice(0, allMoves.length);
 
-        console.log("Player touched the exact center of the spike!");
+        player.x = allMoves[0][0];
+        player.y = allMoves[0][1] - 10;
+        allMoves.splice(1, allMoves.length);
+
+
+        console.log("Congrats");
     }
 
     function onSpikeCollision(colliders, tile) {
@@ -342,6 +341,7 @@ function create ()
         shading.y = layer.y
         chest.y = layer.y
 
+        startTime = startTime - 10000
 
         console.log("Player touched the exact center of the spike!");
     }
@@ -399,17 +399,16 @@ function update ()
     //     movingPlatform.setVelocityX(platformSpeed); // Move right
     // }
 
-    if (Phaser.Input.Keyboard.JustDown(this.wKey)) {
-        player.setVelocityX(-Math.sqrt((universalScale*100000)*(-((horizontalSlider.x - window.innerWidth*.455)/window.innerWidth*.4325)))); 
+    if (aKey.isDown) {
+        player.setVelocityX(-200);
+    } else if (dKey.isDown) {
+        player.setVelocityX(200);
     }
-    if (Phaser.Input.Keyboard.JustDown(this.aKey)) {
-        player.setVelocityY(-Math.sqrt((universalScale*100000)*(-((horizontalSlider.x - window.innerWidth*.455)/window.innerWidth*.4325)))); 
-    }
-    if (Phaser.Input.Keyboard.JustDown(this.sKey)) {
-        player.setVelocityX(-Math.sqrt((universalScale*100000)*(-((horizontalSlider.x - window.innerWidth*.455)/window.innerWidth*.4325)))); 
-    }
-    if (Phaser.Input.Keyboard.JustDown(this.dKey)) {
-        player.setVelocityY(-Math.sqrt((universalScale*100000)*(-((horizontalSlider.x - window.innerWidth*.455)/window.innerWidth*.4325)))); 
+
+    if (wKey.isDown) {
+        player.setVelocityY(-200);
+    } else if (sKey.isDown) {
+        player.setVelocityY(200);
     }
 
     if (Phaser.Input.Keyboard.JustDown(spaceBar)) {
