@@ -4,9 +4,8 @@ class Universal extends Phaser.Scene {
     }
   
     preload() {
-      // Load map-specific assets here (tilemap JSON, tileset images)
-      this.load.tilemapTiledJSON('map', 'assets/map1.json');
-      this.load.image('tiles', 'assets/tileset.png');
+      this.load.image('bomb', 'assets/bomb.png');
+
     }
   
     create() {

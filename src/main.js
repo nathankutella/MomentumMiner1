@@ -1,5 +1,7 @@
 
 import { MapScene } from './scenes/MapScene.js';
+import { MenuScenes } from './scenes/MenuScenes.js';
+
 
 var config = {
     type: Phaser.AUTO,
@@ -14,7 +16,7 @@ var config = {
     },
     pixelArt: true,
     scene: 
-        [MapScene]
+        [MapScene, MenuScenes]
     //     preload: preload,
     //     create: create,
     //     update: update

@@ -18,6 +18,7 @@ class LeaderboardScenes extends Phaser.Scene {
   
     update() {
       // Map-specific logic (e.g., player interaction with this map)
+      this.cursors = this.input.keyboard.createCursorKeys();
 
       //Possible moving platforms
     }
