@@ -4,7 +4,8 @@ export class MenuScenes extends Phaser.Scene {
 
       this.menu;
       this.cursors;
-      this.universalScale = (window.innerWidth*.96) / 320
+      this.universalScaleX = (window.innerWidth) / 2000
+      this.universalScaleY = (window.innerHeight) / 1000
 
 
 
@@ -19,12 +20,22 @@ export class MenuScenes extends Phaser.Scene {
     }
   
     create() {
+      var universalScale;
+      if (this.universalScaleX > this.universalScaleY) {
+        universalScale = this.universalScaleY;
+      } else if (this.universalScaleX < this.universalScaleY) {
+        universalScale = this.universalScaleX;
+      } else {
+        universalScale = this.universalScaleX;
+      }
 
       this.menu = this.add.image(window.innerWidth*0.48,  window.innerHeight*0.48, 'menu').setInteractive().setScale(window.innerWidth / 400, window.innerHeight / 300);
-      let button1 = this.add.image(window.innerWidth*0.48, window.innerHeight* 0.43, 'button').setInteractive().setScale(window.innerWidth / 480, window.innerHeight / 420);
+      let button1 =    this.add.image(window.innerWidth*0.48, window.innerHeight* 0.43, 'button').setInteractive().setScale(window.innerWidth / 480, window.innerHeight / 420);
+      let button1Text = this.add.text(window.innerWidth*0.2, window.innerHeight* 0.375, 'MENU', { fontSize: universalScale * 150 + 'px', color: '#FFFFFF' }).setShadow(5, 5, '#000000', 5);
+
       let button2 = this.add.image(window.innerWidth*0.48, window.innerHeight* 0.58, 'button').setInteractive().setScale(window.innerWidth / 480, window.innerHeight / 420);
       let button3 = this.add.image(window.innerWidth*0.48, window.innerHeight* 0.73, 'button').setInteractive().setScale(window.innerWidth / 480, window.innerHeight / 420);
-      let menuText = this.add.text(window.innerWidth * 0.31, window.innerHeight * 0.13, 'MENU', { fontSize: window.innerWidth * 0.15 + 'px', color: '#FFFFFF' }).setShadow(5, 5, '#000000', 5);
+      let menuText = this.add.text(window.innerWidth * 0.31, window.innerHeight * 0.13, 'MENU', { fontSize: universalScale * 300 + 'px', color: '#FFFFFF' }).setShadow(5, 5, '#000000', 5);
 
       let close = this.add.image(window.innerWidth*0.13,  window.innerHeight*0.15, 'close').setInteractive().setScale(window.innerWidth / 400, window.innerHeight / 300);
           close.on('pointerdown', () => {
