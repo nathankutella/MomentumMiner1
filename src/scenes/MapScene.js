@@ -47,8 +47,8 @@ export class MapScene extends Phaser.Scene {
   
     preload() {
       this.load.image('star', 'assets/star.png');
-      this.load.spritesheet('dude', 'assets/dude.png',
-          { frameWidth: 32, frameHeight: 48 }
+      this.load.spritesheet('dude', 'assets/miner.png',
+          { frameWidth: 32, frameHeight: 32  }
       );
       this.load.image("tiles", "assets/tileset.png");
       this.load.tilemapTiledJSON("map1", "assets/map1.tmj");
@@ -99,23 +99,39 @@ export class MapScene extends Phaser.Scene {
 
       this.anims.create({
           key: 'left',
-          frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
-          frameRate: 10,
+          // key: 'leftJump',
+          frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 4 }),
+          frameRate: 12,
           repeat: -1
       });
+
+      this.anims.create({
+        key: 'left',
+        // key: 'leftJump',
+        frames: this.anims.generateFrameNumbers('dude', { start: 4, end: 5 }),
+        frameRate: 4,
+        repeat: -1
+    });
 
       this.anims.create({
           key: 'turn',
-          frames: [ { key: 'dude', frame: 4 } ],
+          frames: [ { key: 'dude', frame: 6 } ],
           frameRate: 20
-      });
+      });   
 
       this.anims.create({
           key: 'right',
-          frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
-          frameRate: 10,
+          frames: this.anims.generateFrameNumbers('dude', { start: 9, end: 13 }),
+          frameRate: 12,
           repeat: -1
-             });
+      });
+
+     this.anims.create({
+      key: 'rightJump',
+      frames: this.anims.generateFrameNumbers('dude', { start: 7, end: 8 }),
+      frameRate: 4,
+      repeat: -1
+      });
 
 
 
