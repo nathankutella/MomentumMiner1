@@ -1,8 +1,9 @@
 export class MapScene extends Phaser.Scene {
-    
-  
+
     constructor() {
       super('MapScene');
+      this.level = 1;
+
       this.slidersMovement = [-1, -1]
       this.levelPRs = [null]
       this.level = 1;
@@ -43,6 +44,16 @@ export class MapScene extends Phaser.Scene {
       this.universalScale = (window.innerWidth*.96) / 320
       this.gravity = 350;    
       this.score = 0;
+
+      this.viewMap = false;
+      this.playerInMap = true;
+
+    }
+
+    init(data) {
+      if (data.level !== undefined) {
+        this.level = data.level;
+      }
     }
   
     preload() {
@@ -60,7 +71,14 @@ export class MapScene extends Phaser.Scene {
     }
   
     create() {
+      if (this.level == 1){
         this.map = this.make.tilemap({ key: "map1" });
+      } else if (this.level == 2){
+        this.map = this.make.tilemap({ key: "map2" });
+      } else {
+        this.map = this.make.tilemap({ key: "map1" });
+      }
+        
 
         // console.log(map.tilesets);
 
@@ -345,6 +363,8 @@ onSpikeCollision(colliders, tile) {
           }
       }
 
+      var mKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.M);
+
       var wKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
       var aKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
       var sKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
@@ -361,53 +381,42 @@ onSpikeCollision(colliders, tile) {
       //     movingPlatform.setVelocityX(platformSpeed); // Move right
       // }
 
-      if (aKey.isDown) {
-        this.player.setVelocityX(-200);
-      } else if (dKey.isDown) {
-        this.player.setVelocityX(200);
+      if (this.playerInMap && !this.viewMap){
+        if (Phaser.Input.Keyboard.JustDown(spaceBar) || this.screenClicked) {
+          this.screenClicked = false;
+            if (this.velocityLocked[0]) {
+                if (this.velocityLocked[1]) { 
+                    if (this.player.body.blocked.down){
+                        this.player.setVelocityY(-Math.sqrt((this.universalScale*150000)*(((window.innerHeight*.845 - this.verticalSlider.y)/window.innerHeight*.795)))); 
+                        // -(universalScale*64)
+                        if ((((this.horizontalSlider.x - window.innerWidth*.455)/window.innerWidth*.4325)) < 0){
+                          this.player.setVelocityX(-Math.sqrt((this.universalScale*100000)*(-((this.horizontalSlider.x - window.innerWidth*.455)/window.innerWidth*.4325)))); 
+                            console.log(-Math.sqrt((this.universalScale*100000)*(-((this.horizontalSlider.x - window.innerWidth*.455)/window.innerWidth*.4325))) + 'horiz');
+  
+                        } else {
+                          this.player.setVelocityX(Math.sqrt((this.universalScale*100000)*(((this.horizontalSlider.x - window.innerWidth*.455)/window.innerWidth*.4325)))); 
+                            console.log(Math.sqrt((this.universalScale*100000)*(((this.horizontalSlider.x - window.innerWidth*.455)/window.innerWidth*.4325))) + 'horiz');
+                        }
+                        console.log(-Math.sqrt((this.universalScale*280)*(((window.innerHeight*.845 - this.verticalSlider.y)/window.innerHeight*.795))) + 'vert');
+                        console.log(this.universalScale + 'scale');
+                        this.velocityLocked[0] = false;
+                        this.velocityLocked[1] = false;
+  
+                        this.verticalSlider.setVelocityY(  this.slidersMovement[0]*window.innerHeight*0.35);
+                        this.horizontalSlider.setVelocityX(this.slidersMovement[1]*window.innerWidth*0.35);
+                        this.hasMoved = true;
+                    }
+                } else {
+                    this.horizontalSlider.setVelocityX(0);
+                    this.velocityLocked[1] = true;
+                }
+            } else {
+                this.verticalSlider.setVelocityY(0);  
+                this.velocityLocked[0] = true;
+            }
+        }
       }
-
-      if (wKey.isDown) {
-        this.player.setVelocityY(-200);
-      } else if (sKey.isDown) {
-        this.player.setVelocityY(200);
-      }
-
-
-      if (Phaser.Input.Keyboard.JustDown(spaceBar) || this.screenClicked) {
-        this.screenClicked = false;
-          if (this.velocityLocked[0]) {
-              if (this.velocityLocked[1]) { 
-                  if (this.player.body.blocked.down){
-                      this.player.setVelocityY(-Math.sqrt((this.universalScale*150000)*(((window.innerHeight*.845 - this.verticalSlider.y)/window.innerHeight*.795)))); 
-                      // -(universalScale*64)
-                      if ((((this.horizontalSlider.x - window.innerWidth*.455)/window.innerWidth*.4325)) < 0){
-                        this.player.setVelocityX(-Math.sqrt((this.universalScale*100000)*(-((this.horizontalSlider.x - window.innerWidth*.455)/window.innerWidth*.4325)))); 
-                          console.log(-Math.sqrt((this.universalScale*100000)*(-((this.horizontalSlider.x - window.innerWidth*.455)/window.innerWidth*.4325))) + 'horiz');
-
-                      } else {
-                        this.player.setVelocityX(Math.sqrt((this.universalScale*100000)*(((this.horizontalSlider.x - window.innerWidth*.455)/window.innerWidth*.4325)))); 
-                          console.log(Math.sqrt((this.universalScale*100000)*(((this.horizontalSlider.x - window.innerWidth*.455)/window.innerWidth*.4325))) + 'horiz');
-                      }
-                      console.log(-Math.sqrt((this.universalScale*280)*(((window.innerHeight*.845 - this.verticalSlider.y)/window.innerHeight*.795))) + 'vert');
-                      console.log(this.universalScale + 'scale');
-                      this.velocityLocked[0] = false;
-                      this.velocityLocked[1] = false;
-
-                      this.verticalSlider.setVelocityY(  this.slidersMovement[0]*window.innerHeight*0.35);
-                      this.horizontalSlider.setVelocityX(this.slidersMovement[1]*window.innerWidth*0.35);
-                      this.hasMoved = true;
-                  }
-              } else {
-                  this.horizontalSlider.setVelocityX(0);
-                  this.velocityLocked[1] = true;
-              }
-          } else {
-              this.verticalSlider.setVelocityY(0);  
-              this.velocityLocked[0] = true;
-          }
-      }
-
+      
       if (this.velocityLocked[0]) {
           this.verticalSlider.setVelocityY(0);  
           if (this.velocityLocked[1]) { 
@@ -429,30 +438,107 @@ onSpikeCollision(colliders, tile) {
           this.horizontalSlider.setVelocityX(window.innerWidth*0.35); // Move right
       }
 
-
-
-
-      // Move layer UP when player is below 75% of screen & layer hasn't reached max height
-      if (this.player.y > window.innerHeight * 0.75 && this.layer.y > -640 * this.universalScale + window.innerHeight) {
-          this.layer.y -= window.innerHeight * 0.03;
-          this.player.y -= window.innerHeight * 0.03;
-      } 
-      // Move layer DOWN when player is above 25% of screen & layer hasn't reached min height
-      else if (this.player.y < window.innerHeight * 0.25 && this.layer.y < 0 - window.innerHeight * 0.03) {
-          this.layer.y += window.innerHeight * 0.03;
-          this.player.y += window.innerHeight * 0.03;
+      if (Phaser.Input.Keyboard.JustDown(mKey)) {
+        this.viewMap = !this.viewMap;
+        if (this.viewMap){
+          this.player.setCollideWorldBounds(false);
+          this.stars.setCollideWorldBounds(false);
+        }
       }
 
-      // Move layer LEFT when player is near the right edge & hasn't reached max left position
-      if (this.player.x > window.innerWidth * 0.75 && this.layer.x > -480 * this.universalScale  + window.innerWidth*.97) {
-          this.layer.x -= window.innerWidth * 0.01;
-          this.player.x -= window.innerWidth * 0.01;
-      } 
-      // Move layer RIGHT when player is near the left edge & hasn't reached max right position
-      else if (this.player.x < window.innerWidth * 0.25 && this.layer.x < 0) {
-        this.layer.x += window.innerWidth * 0.01;
-        this.player.x += window.innerWidth * 0.01;
+      if (!this.viewMap){
+
+        // if (aKey.isDown) {
+        //   this.player.setVelocityX(-200);
+        // } else if (dKey.isDown) {
+        //   this.player.setVelocityX(200);
+        // }
+
+        // if (wKey.isDown) {
+        //   this.player.setVelocityY(-200);
+        // } else if (sKey.isDown) {
+        //   this.player.setVelocityY(200);
+        // }
+
+        // Move layer UP when player is below 75% of screen & layer hasn't reached max height
+        if (this.player.y > window.innerHeight * 0.75 && this.layer.y > -640 * this.universalScale + window.innerHeight) {
+            this.layer.y -= window.innerHeight * 0.03;
+            if (this.playerInMap){
+              this.player.y -= window.innerHeight * 0.03;
+            }
+            
+        } 
+        // Move layer DOWN when player is above 25% of screen & layer hasn't reached min height
+        else if (this.player.y < window.innerHeight * 0.25 && this.layer.y < 0 - window.innerHeight * 0.03) {
+            this.layer.y += window.innerHeight * 0.03;
+            if (this.playerInMap){
+              this.player.y += window.innerHeight * 0.03;
+            }
+        }
+
+        // Move layer LEFT when player is near the right edge & hasn't reached max left position
+        if (this.player.x > window.innerWidth * 0.75 && this.layer.x > -480 * this.universalScale  + window.innerWidth*.97) {
+            this.layer.x -= window.innerWidth * 0.01;
+            if (this.playerInMap){
+            this.player.x -= window.innerWidth * 0.01;
+            }
+        } 
+        // Move layer RIGHT when player is near the left edge & hasn't reached max right position
+        else if (this.player.x < window.innerWidth * 0.25 && this.layer.x < 0) {
+          this.layer.x += window.innerWidth * 0.01;
+          this.playerInMap = true;
+          if (this.playerInMap){
+            this.player.x += window.innerWidth * 0.01;
+          }
+        }
+
+        if (this.player.y < window.innerHeight * 0.9|| (this.layer.y == -640 * this.universalScale + window.innerHeight && this.player.y >= window.innerHeight * 0.9)){
+          if (this.player.y > window.innerHeight * 0.1 || (this.layer.y < 0 - window.innerHeight * 0.03 && this.player.y <= window.innerHeight * 0.1)) {
+            if (this.player.x < window.innerWidth * 0.9 || (this.layer.x > -480 * this.universalScale  + window.innerWidth*.97 && this.player.x >= window.innerWidth * 0.9)) {
+              if (this.player.x > window.innerWidth * 0.1 || (this.layer.x == 0 && this.player.x <= window.innerWidth * 0.1)) {
+                this.playerInMap = true;
+                this.player.setCollideWorldBounds(true);
+                this.stars.setCollideWorldBounds(true);
+              }
+            }
+          }
+        }
+
+      } else {
+        if (this.layer.y > -640 * this.universalScale + window.innerHeight) {
+          if (sKey.isDown) {
+            this.layer.y -= window.innerHeight * 0.03;
+            this.player.y -= window.innerHeight * 0.03;
+            this.stars.y -= window.innerHeight * 0.03;
+
+          }
+        }
+        if (this.layer.y < 0 - window.innerHeight * 0.03){
+          if (wKey.isDown) {
+            this.layer.y += window.innerHeight * 0.03;
+            this.player.y += window.innerHeight * 0.03;
+            this.stars.y += window.innerHeight * 0.03;
+
+          }
+        }
+        if (this.layer.x > -480 * this.universalScale  + window.innerWidth*.97) {
+          if (dKey.isDown) {
+            this.layer.x -= window.innerWidth * 0.01;
+            this.player.x -= window.innerWidth * 0.01;
+            this.stars.x -= window.innerWidth * 0.01;
+
+          }
+        } 
+        if (this.layer.x < 0) {
+          if (aKey.isDown) {
+            this.layer.x += window.innerWidth * 0.01;
+            this.player.x += window.innerWidth * 0.01;
+            this.stars.x += window.innerWidth * 0.01;
+
+          }
+        }
       }
+      
 
 
       // layer.x = map.x

@@ -191,6 +191,19 @@ export class MenuScenes extends Phaser.Scene {
         menuGroup.setVisible(false);
       });
 
+      level1Button.on('pointerdown', () => {
+        this.scene.stop('MapScene'); 
+        this.scene.stop('MenuScene'); 
+        this.scene.start('MapScene', { level: 1});
+
+      });
+
+      level2Button.on('pointerdown', () => {
+        this.scene.stop('MapScene'); 
+        this.scene.stop('MenuScene'); 
+        this.scene.start('MapScene', { level: 2});
+
+      });
 
     }
   
