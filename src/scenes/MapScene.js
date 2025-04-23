@@ -124,7 +124,7 @@ export class MapScene extends Phaser.Scene {
       });
 
       this.anims.create({
-        key: 'left',
+        key: 'leftJump',
         // key: 'leftJump',
         frames: this.anims.generateFrameNumbers('dude', { start: 4, end: 5 }),
         frameRate: 4,
@@ -365,7 +365,17 @@ onSpikeCollision(colliders, tile) {
           this.player.setVelocityX(0);
           this.stars.setVelocityY(-6);
           this.inSpike = false;
-          this.player.anims.play('turn');  
+          // console.log(this.horizontalSlider.x+ " Velo")
+          if (!this.velocityLocked[0]){
+            this.player.anims.play('turn');  
+          } else {
+            if (this.horizontalSlider.x > window.innerWidth / 2 - window.innerWidth*.045  ){
+              this.player.anims.play('rightJump', true);
+            } else {
+              this.player.anims.play('leftJump', true); 
+            }
+          }
+
       } else {
           this.stars.setVelocityY(0);
           this.stars.x = this.player.x 
@@ -375,7 +385,7 @@ onSpikeCollision(colliders, tile) {
           } else if (this.player.body.velocity.x < 0){
             this.player.anims.play('left', true);
           } else {
-            this.player.anims.play('turn');
+            this.player.anims.play('turn');  
           }
       }
 
