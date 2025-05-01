@@ -223,13 +223,14 @@ export class MenuScenes extends Phaser.Scene {
       // Map-specific logic (e.g., player interaction with this map)
       this.cursors = this.input.keyboard.createCursorKeys();
 
-      this.leaderboard1Text.setText('Username1: #1'    + ' PR:' + 100); // Update text
-      this.leaderboard2Text.setText('Username2: #2'    + ' PR:' + 100); // Update text
-      this.leaderboard3Text.setText('Username3: #3'    + ' PR:' + 100); // Update text
-      this.leaderboard4Text.setText('Username4: #4'    + ' PR:' + 100); // Update text
-      this.leaderboard5Text.setText('Username5: #5'    + ' PR:' + 100); // Update text
-      this.leaderboard6Text.setText('Username6: #6'    + ' PR:' + 100); // Update text
-      this.leaderboardUserText.setText('User: #x' + ' PR:' + 100); // Update text
+      
+      this.leaderboard1Text.setText('#1: ' + 'Username1' + ' PR:' + 100); // Update text
+      this.leaderboard2Text.setText('#2: ' + 'Username2' + ' PR:' + 100); // Update text
+      this.leaderboard3Text.setText('#3: ' + 'Username3' + ' PR:' + 100); // Update text
+      this.leaderboard4Text.setText('#4: ' + 'Username4' + ' PR:' + 100); // Update text
+      this.leaderboard5Text.setText('#5: ' + 'Username5' + ' PR:' + 100); // Update text
+      this.leaderboard6Text.setText('#6: ' + 'Username6' + ' PR:' + 100); // Update text
+      this.leaderboardUserText.setText('#'+ 'x' + ': ' + 'User' + ' PR:' + 100); // Update text
       //Possible moving platforms
     }
   }
