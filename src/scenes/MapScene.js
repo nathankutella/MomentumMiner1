@@ -10,9 +10,13 @@ export class MapScene extends Phaser.Scene {
       this.elapsedTime;
       this.startTime;
 
+      this.winText ;
+      this.win2Text;
+      this.win3Text;
+      this.win;
       this.menuText 
       this.screenClicked = false;
-
+      this.mode = true;
       this.map;
       this.tileset;
       this.bg;
@@ -22,7 +26,10 @@ export class MapScene extends Phaser.Scene {
       this.water;
       this.cosmetics;
       this.spikes;
+      this.universalScaleX = (window.innerWidth) / 2000
+      this.universalScaleY = (window.innerHeight) / 1000
 
+      this.closeButton;
       this.player;
       this.stars;
       this.cursors;
@@ -40,7 +47,7 @@ export class MapScene extends Phaser.Scene {
       this.hasMoved = true;
 
       this.platformSpeed = 100;
-      this.sliderSpeed = 450;
+      this.sliderSpeed = 1;
       this.universalScale = (window.innerWidth*.96) / 320
       this.gravity = 350;    
       this.score = 0;
@@ -54,6 +61,12 @@ export class MapScene extends Phaser.Scene {
       if (data.level !== undefined) {
         this.level = data.level;
       }
+      if (data.mode !== undefined) {
+        console.log("Hello1")
+        this.mode = data.mode;
+      }
+      this.allMoves.splice(1, this.allMoves.length);
+
     }
   
     preload() {
@@ -67,7 +80,9 @@ export class MapScene extends Phaser.Scene {
       this.load.image('bomb', 'assets/bomb.png');
       this.load.image('rewind', 'assets/rewind.png');
       this.load.image('pause', 'assets/pause.png');
-
+      this.load.image('right', 'assets/right.png');
+      this.load.image('close', 'assets/x.png');
+      this.load.image('menubg', 'assets/menubackground.png');
     }
   
     create() {
@@ -79,6 +94,12 @@ export class MapScene extends Phaser.Scene {
         this.map = this.make.tilemap({ key: "map1" });
       }
         
+
+      if (this.mode){
+        this.sliderSpeed = 1;
+      } else {
+        this.sliderSpeed = 2.5;
+      }
 
         // console.log(map.tilesets);
 
@@ -106,7 +127,7 @@ export class MapScene extends Phaser.Scene {
 
       this.player = this.physics.add.sprite(window.innerHeight*0.05, window.innerHeight - this.universalScale*64, 'dude').setScale( this.universalScale/2, this.universalScale/2);
 
-      this.player.setBounce(0.2);
+      this.player.setBounce(0.2, 0.01);
       this.player.setCollideWorldBounds(true);
 
       this.stars = this.physics.add.sprite(window.innerHeight*0.05, window.innerHeight - this.universalScale*64, 'star').setScale( this.universalScale/10, this.universalScale/5).setVisible(false);
@@ -139,7 +160,7 @@ export class MapScene extends Phaser.Scene {
 
       this.anims.create({
           key: 'right',
-          frames: this.anims.generateFrameNumbers('dude', { start: 9, end: 13 }),
+          frames: this.anims.generateFrameNumbers('dude', { start: 9, end: 12 }),
           frameRate: 12,
           repeat: -1
       });
@@ -176,12 +197,12 @@ export class MapScene extends Phaser.Scene {
       //Vertical Ball
       this.verticalSlider = this.physics.add.sprite(window.innerWidth - window.innerWidth*.065,window.innerHeight / 2 - window.innerHeight*.045, 'bomb').setScale((window.innerWidth*.96) / 2000*2, (window.innerWidth*.96) / 2000*2);
       this.verticalSlider.body.gravity.y = -this.gravity;
-      this.verticalSlider.setVelocityY(this.slidersMovement[1]*(window.innerHeight*0.35));
+      this.verticalSlider.setVelocityY(this.slidersMovement[1]*(window.innerHeight*0.35)*this.sliderSpeed);
 
       //Horizontal Ball
       this.horizontalSlider = this.physics.add.sprite(window.innerWidth / 2 - window.innerWidth*.045,  window.innerHeight - window.innerHeight*.068, 'bomb').setScale((window.innerHeight*.96) / 1000*2, (window.innerHeight*.96) / 1000*2);
       this.horizontalSlider.body.gravity.y = -this.gravity;
-      this.horizontalSlider.setVelocityX(this.slidersMovement[1]*(window.innerWidth*0.35));
+      this.horizontalSlider.setVelocityX(this.slidersMovement[1]*(window.innerWidth*0.35)*this.sliderSpeed);
 
       this.player.setFrictionX(.1);
       this.player.setFrictionY(.1);
@@ -189,13 +210,31 @@ export class MapScene extends Phaser.Scene {
       var textSize = window.innerWidth*0.04;
 
       this.startTime = this.time.now;
-      this.timerText = this.add.text(window.innerWidth*0.134, window.innerHeight*0.028, 'Time: 0s', { fontSize: textSize + 'px', color: '#FFFFFF' });
+      this.timerText = this.add.text(window.innerWidth*0.194, window.innerHeight*0.028, 'Time: 0s', { fontSize: textSize + 'px', color: '#FFFFFF' });
 
 
       let pause = this.add.image(window.innerWidth*0.04, window.innerWidth*0.04, 'pause').setInteractive().setScale(this.universalScale*1.25);
       let rewind = this.add.image(window.innerWidth*0.10, window.innerWidth*0.04, 'rewind').setInteractive().setScale(this.universalScale*1.25);
+      let right = this.add.image(window.innerWidth*0.16, window.innerWidth*0.04, 'right').setInteractive().setScale(this.universalScale*1.25);
 
       var universalScaleText;
+
+      var universalScale1;
+      if (this.universalScaleX > this.universalScaleY) {
+        universalScale1 = this.universalScaleY;
+      } else if (this.universalScaleX < this.universalScaleY) {
+        universalScale1 = this.universalScaleX;
+      } else {
+        universalScale1 = this.universalScaleX;
+      }
+
+      
+      this.win = this.add.image(window.innerWidth*0.48,  window.innerHeight*0.48, 'menubg').setInteractive().setScale(window.innerWidth / 400, window.innerHeight / 300).setVisible(false);
+
+      this.winText = this.add.text(window.innerWidth * 0.48, window.innerHeight * 0.28, 'You Win', { fontSize: universalScale1 * 250 + 'px', color: '#FFFFFF' }).setOrigin(0.5).setShadow(5, 5, '#000000', 5).setVisible(false);
+      this.win2Text = this.add.text(window.innerWidth * 0.48, window.innerHeight * 0.53, 'You finished in ' + this.elapsedTime + "s", { fontSize: universalScale1 * 100 + 'px', color: '#FFFFFF' }).setOrigin(0.5).setShadow(5, 5, '#000000', 5).setVisible(false);
+      this.win3Text = this.add.text(window.innerWidth * 0.48, window.innerHeight * 0.68, 'You best time is ' + this.levelPRs[this.level-1] + "s", { fontSize: universalScale1 * 100 + 'px', color: '#FFFFFF' }).setOrigin(0.5).setShadow(5, 5, '#000000', 5).setVisible(false);
+
 
       if (innerWidth / 2000 > innerHeight / 1000) {
         universalScaleText = innerHeight / 1000;
@@ -209,8 +248,47 @@ export class MapScene extends Phaser.Scene {
 
 
 
+
+      this.closeButton = this.add.image(window.innerWidth*0.15,  window.innerHeight*0.17, 'close').setInteractive().setScale(window.innerWidth / 200, window.innerHeight / 150).setVisible(false);
+
+      this.closeButton.on('pointerdown', () => {
+        this.startTime = this.time.now;
+
+        this.layer.x = this.allMoves[0][2];
+        this.layer.y = this.allMoves[0][3];
+            // layer.x = map.x
+        this.bg.x =        this.layer.x
+        this.cosmetics.x = this.layer.x
+        this.spikes.x =    this.layer.x
+        this.water.x =    this.layer.x
+        this.shading.x =   this.layer.x
+        this.chest.x =     this.layer.x
+    
+        // layer.y = map.y
+        this.bg.y =        this.layer.y
+        this.cosmetics.y = this.layer.y
+        this.spikes.y =    this.layer.y
+        this.water.y =    this.layer.y
+        this.shading.y =   this.layer.y
+        this.chest.y =     this.layer.y
+    
+    
+        this.player.x = this.allMoves[0][0];
+        this.player.y = this.allMoves[0][1] - 10;
+        this.allMoves.splice(1, this.allMoves.length);
+
+        this.win.setVisible(false);
+        this.winText.setVisible(false);
+        this.win2Text.setVisible(false);
+        this.win3Text.setVisible(false);
+        this.closeButton.setVisible(false);
+
+      }); 
+
       setupButtonInteraction(pause);
       setupButtonInteraction(rewind);
+      setupButtonInteraction(right);
+      // setupButtonInteraction(close);
 
 
       function setupButtonInteraction(button) {
@@ -227,6 +305,11 @@ export class MapScene extends Phaser.Scene {
       pause.on('pointerdown', () => {
         this.scene.launch('MenuScenes');
           console.log('Button clicked!');
+      });
+
+      right.on('pointerdown', () => {
+        this.scene.stop('MapScene');
+        this.scene.start('MapScene', { level: this.level, mode: !this.mode});
       });
 
 
@@ -270,48 +353,58 @@ export class MapScene extends Phaser.Scene {
       this.input.on('pointerdown', (pointer) => {
         if (pointer.x > window.innerWidth*0.05 && pointer.x < window.innerWidth*0.95 && pointer.y > window.innerHeight*0.075*this.universalScale && pointer.y < window.innerHeight*0.85) {
           this.screenClicked = true;
-          console.log('Tapped within the specific area!');
+          // console.log('Tapped within the specific area!');
         }
       });
   
     }
 
   onChestCollision(colliders, tile) {
-
-    if (!tile || tile.index === 0 || tile.index === -1) return; 
+    if (!this.win.visible){
+      if (!tile || tile.index === 0 || tile.index === -1) return; 
 
     if (this.levelPRs[this.level-1] > this.elapsedTime || this.levelPRs[this.level-1] == null) {
         this.levelPRs[this.level-1] = this.elapsedTime;
     }
-    this.startTime = this.time.now;
+
+    
+    this.win2Text.setText('You finished in ' + this.elapsedTime + "s"); // Update text
+    this.win3Text.setText('You best time is ' + this.levelPRs[this.level-1] + "s"); // Update text
+
+    
+    // this.startTime = this.time.now;
+    // this.layer.x = this.allMoves[0][2];
+    // this.layer.y = this.allMoves[0][3];
+    //     // layer.x = map.x
+    // this.bg.x =        this.layer.x
+    // this.cosmetics.x = this.layer.x
+    // this.spikes.x =    this.layer.x
+    // this.water.x =    this.layer.x
+    // this.shading.x =   this.layer.x
+    // this.chest.x =     this.layer.x
+
+    // // layer.y = map.y
+    // this.bg.y =        this.layer.y
+    // this.cosmetics.y = this.layer.y
+    // this.spikes.y =    this.layer.y
+    // this.water.y =    this.layer.y
+    // this.shading.y =   this.layer.y
+    // this.chest.y =     this.layer.y
 
 
+    // this.player.x = this.allMoves[0][0];
+    // this.player.y = this.allMoves[0][1] - 10;
+    // this.allMoves.splice(1, this.allMoves.length);
 
-    this.layer.x = this.allMoves[0][2];
-    this.layer.y = this.allMoves[0][3];
-        // layer.x = map.x
-    this.bg.x =        this.layer.x
-    this.cosmetics.x = this.layer.x
-    this.spikes.x =    this.layer.x
-    this.water.x =    this.layer.x
-    this.shading.x =   this.layer.x
-    this.chest.x =     this.layer.x
-
-    // layer.y = map.y
-    this.bg.y =        this.layer.y
-    this.cosmetics.y = this.layer.y
-    this.spikes.y =    this.layer.y
-    this.water.y =    this.layer.y
-    this.shading.y =   this.layer.y
-    this.chest.y =     this.layer.y
-
-
-    this.player.x = this.allMoves[0][0];
-    this.player.y = this.allMoves[0][1] - 10;
-    this.allMoves.splice(1, this.allMoves.length);
-
+    this.win.setVisible(true);
+    this.winText.setVisible(true);
+    this.win2Text.setVisible(true);
+    this.win3Text.setVisible(true);
+    this.closeButton.setVisible(true);
 
     console.log("Congrats");
+    }
+    
 }
 
 onSpikeCollision(colliders, tile) {
@@ -354,7 +447,7 @@ onSpikeCollision(colliders, tile) {
         this.player.setVelocityY(-500);
       }
 
-      if (this.player.body.blocked.down){
+      if (this.player.body.blocked.down && this.player.body.velocity.y > -1){
           if (this.hasMoved){
             this.allMoves.push([this.player.x, this.player.y, this.layer.x, this.layer.y]);
             this.hasMoved = false;
@@ -365,7 +458,9 @@ onSpikeCollision(colliders, tile) {
           this.player.setVelocityX(0);
           this.stars.setVelocityY(-6);
           this.inSpike = false;
-          // console.log(this.horizontalSlider.x+ " Velo")
+          // console.log(this.player.body.velocity.x + " Velo")
+          // console.log(this.player.body.velocity.y + " Velo")
+
           if (!this.velocityLocked[0]){
             this.player.anims.play('turn');  
           } else {
@@ -428,8 +523,8 @@ onSpikeCollision(colliders, tile) {
                         this.velocityLocked[0] = false;
                         this.velocityLocked[1] = false;
   
-                        this.verticalSlider.setVelocityY(  this.slidersMovement[0]*window.innerHeight*0.35);
-                        this.horizontalSlider.setVelocityX(this.slidersMovement[1]*window.innerWidth*0.35);
+                        this.verticalSlider.setVelocityY(  this.slidersMovement[0]*window.innerHeight*0.35*this.sliderSpeed);
+                        this.horizontalSlider.setVelocityX(this.slidersMovement[1]*window.innerWidth*0.35*this.sliderSpeed);
                         this.hasMoved = true;
                     }
                 } else {
@@ -451,17 +546,17 @@ onSpikeCollision(colliders, tile) {
       } 
       if (this.verticalSlider.y >= (window.innerHeight*.845)) {
           this.slidersMovement[0] = -1;
-          this.verticalSlider.setVelocityY(-(window.innerHeight*0.35)); // Move left
+          this.verticalSlider.setVelocityY(-(window.innerHeight*0.35)*this.sliderSpeed); // Move left
       } else if (this.verticalSlider.y <= (window.innerHeight*.065)) {
         this.slidersMovement[0] = 1;
-        this.verticalSlider.setVelocityY(window.innerHeight*0.35); // Move right
+        this.verticalSlider.setVelocityY(window.innerHeight*0.35*this.sliderSpeed); // Move right
       }
       if (this.horizontalSlider.x >= (window.innerWidth*.878)) {
           this.slidersMovement[1] = -1;
-          this.horizontalSlider.setVelocityX(-(window.innerWidth*0.35)); // Move left
+          this.horizontalSlider.setVelocityX(-(window.innerWidth*0.35)*this.sliderSpeed); // Move left
       } else if (this.horizontalSlider.x <= (window.innerWidth*.032)) {
           this.slidersMovement[1] = 1;
-          this.horizontalSlider.setVelocityX(window.innerWidth*0.35); // Move right
+          this.horizontalSlider.setVelocityX(window.innerWidth*0.35*this.sliderSpeed); // Move right
       }
 
       if (Phaser.Input.Keyboard.JustDown(mKey)) {
@@ -474,17 +569,25 @@ onSpikeCollision(colliders, tile) {
 
       if (!this.viewMap){
 
-        // if (aKey.isDown) {
-        //   this.player.setVelocityX(-200);
-        // } else if (dKey.isDown) {
-        //   this.player.setVelocityX(200);
-        // }
+        if (aKey.isDown) {
+          this.player.setVelocityX(-300);
+          this.menuText.setVisible(false);
 
-        // if (wKey.isDown) {
-        //   this.player.setVelocityY(-200);
-        // } else if (sKey.isDown) {
-        //   this.player.setVelocityY(200);
-        // }
+        } else if (dKey.isDown) {
+          this.player.setVelocityX(300);
+          this.menuText.setVisible(false);
+
+        }
+
+        if (wKey.isDown) {
+          this.player.setVelocityY(-300);
+          this.menuText.setVisible(false);
+
+        } else if (sKey.isDown) {
+          this.player.setVelocityY(300);
+          this.menuText.setVisible(false);
+
+        }
 
         // Move layer UP when player is below 75% of screen & layer hasn't reached max height
         if (this.player.y > window.innerHeight * 0.75 && this.layer.y > -640 * this.universalScale + window.innerHeight) {
@@ -533,9 +636,9 @@ onSpikeCollision(colliders, tile) {
       } else {
         if (this.layer.y > -640 * this.universalScale + window.innerHeight) {
           if (sKey.isDown) {
-            this.layer.y -= window.innerHeight * 0.03;
+            this.layer.y -= window.innerHeight *  0.03;
             this.player.y -= window.innerHeight * 0.03;
-            this.stars.y -= window.innerHeight * 0.03;
+            this.stars.y -= window.innerHeight *  0.03;
 
           }
         }
